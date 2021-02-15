@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.header {
+  position: absolute;
+  width: 100%;
+  font-size: 100px;
+  font-weight: 100;
+  text-align: center;
+  color: rgba(33, 115, 70, 0.15);
+  text-rendering: optimizeLegibility;
+}
