@@ -11,12 +11,168 @@
   <body>
     <div id="app">
       <div class="header">todos</div>
+      <div class="main">
+        <div>
+          <input
+            placeholder="What needs to be done?"
+            class="new-todo"
+            v-model.trim="todoTitle"
+            v-focus="true"
+            @keyup.enter="addTodo"
+          />
+        </div>
+        <span
+          v-if="todoList.length"
+          :class="['toggle-all', {completed: isAllTodoCompleted}]"
+          title="Mark all todos as completed"
+          @click="markAllAsCompleted"
+        ></span>
+        <ul class="todo-list">
+          <li class="todo-list-li" v-for="todo in filterTodoList">
+            <div>
+              <span
+                v-if="!editedTodoItem || editedTodoItem.id !==todo.id"
+                :class="['toggle', {completed: todo.completed}]"
+                @click="markAsCompleted(todo)"
+              >
+                <i v-if="todo.completed"></i>
+              </span>
+              <span
+                v-if="!editedTodoItem || editedTodoItem.id !==todo.id"
+                :class="['title', {completed: todo.completed}]"
+                @dblclick="showEditInput(todo)"
+              >
+                {{todo.title}}
+              </span>
+              <span
+                v-if="editedTodoItem !== null && editedTodoItem.id === todo.id"
+                class="title"
+              >
+                <input
+                  v-focus="true"
+                  v-model.trim="todo.title"
+                  class="edit"
+                  @blur="saveEditing(todo)"
+                  @keyup.enter="saveEditing(todo)"
+                  @keyup.esc="cancelEditing(todo)"
+                />
+              </span>
+              <span
+                v-if="!editedTodoItem || editedTodoItem.id !==todo.id"
+                class="destroy"
+                @click="removeTodo(todo)"
+              >
+                ×
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="footer" v-if="todoList.length">
+        <span class="count">
+          <strong>{{leftTodoListCount}}</strong> items left
+        </span>
+        <ul class="filters">
+          <li :class="{selected: filterKey === 'all'}" @click="filterKey='all'">
+            All
+          </li>
+          <li
+            :class="{selected: filterKey === 'active'}"
+            @click="filterKey='active'"
+          >
+            Active
+          </li>
+          <li
+            :class="{selected: filterKey === 'completed'}"
+            @click="filterKey='completed'"
+          >
+            Completed
+          </li>
+        </ul>
+        <button class="clear-completed" @click="clearCompleted">Clear Completed</button>
+      </div>
+      <div class="info">
+        <p>Double-click to edit a todo</p>
+        <p>Press `Enter` or click anywhere to save editing</p>
+        <p>Press `Esc` to cancel editing</p>
+      </div>
     </div>
     <script>
       var app = new Vue({
         el: "#app",
+        directives: {
+          focus: {
+            inserted: function (el) {
+              el.focus();
+            },
+          },
+        },
         data: function () {
-          return {};
+          return {
+            todoTitle: "",
+            todoList: [],
+            editedTodoItem: null,
+            filterKey: "all",
+          };
+        },
+        computed: {
+          leftTodoList: function () {
+            return this.todoList.filter((todo) => !todo.completed);
+          },
+          leftTodoListCount: function () {
+            return this.leftTodoList.length;
+          },
+          completedTodoList: function () {
+            return this.todoList.filter((todo) => todo.completed);
+          },
+          isAllTodoCompleted: function () {
+            return this.leftTodoListCount === 0;
+          },
+          filterTodoList: function () {
+            if (this.filterKey === "active") {
+              return this.leftTodoList;
+            } else if (this.filterKey === "completed") {
+              return this.completedTodoList;
+            }
+            return this.todoList;
+          },
+        },
+        methods: {
+          addTodo: function () {
+            if (!this.todoTitle) return;
+            this.todoList.push({
+              id: Date.parse(new Date()),
+              title: this.todoTitle,
+              completed: false,
+            });
+            this.todoTitle = "";
+          },
+          removeTodo: function (todo) {
+            this.todoList.splice(this.todoList.indexOf(todo), 1);
+          },
+          showEditInput: function (todo) {
+            this.editedTodoItem = { ...todo };
+          },
+          saveEditing: function (todo) {
+            if (todo.title === "") {
+              this.todoList.splice(this.todoList.indexOf(todo), 1);
+            }
+            this.editedTodoItem = null;
+          },
+          cancelEditing: function (todo) {
+            todo.title = this.editedTodoItem.title;
+            this.editedTodoItem = null;
+          },
+          markAsCompleted: function (todo) {
+            todo.completed = !todo.completed;
+          },
+          markAllAsCompleted: function () {
+            let completed = this.isAllTodoCompleted;
+            this.todoList.forEach((todo) => (todo.completed = !completed));
+          },
+          clearCompleted: function() {
+            this.todoList = this.todoList.filter(todo => !todo.completed)
+          }
         },
       });
     </script>
