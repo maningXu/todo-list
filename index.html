@@ -21,14 +21,16 @@
             @keyup.enter="addTodo"
           />
         </div>
-        <span
-          v-if="todoList.length"
-          :class="['toggle-all', {completed: isAllTodoCompleted}]"
-          title="Mark all todos as completed"
-          @click="markAllAsCompleted"
-        ></span>
-        <ul class="todo-list">
-          <li class="todo-list-li" v-for="todo in filterTodoList">
+        <transition name="mark-all-fade">
+          <span
+            v-if="todoList.length"
+            :class="['toggle-all', {completed: isAllTodoCompleted}]"
+            title="Mark all todos as completed"
+            @click="markAllAsCompleted"
+          ></span>
+        </transition>
+        <transition-group name='todo-list' tag='ul' class='todo-list'>
+          <li class="todo-list-li" v-for="(todo, index) in filterTodoList" :key="index">
             <div>
               <span
                 v-if="!editedTodoItem || editedTodoItem.id !==todo.id"
@@ -66,31 +68,38 @@
               </span>
             </div>
           </li>
-        </ul>
+        </transition-group>
       </div>
-      <div class="footer" v-if="todoList.length">
-        <span class="count">
-          <strong>{{leftTodoListCount}}</strong> items left
-        </span>
-        <ul class="filters">
-          <li :class="{selected: filterKey === 'all'}" @click="filterKey='all'">
-            All
-          </li>
-          <li
-            :class="{selected: filterKey === 'active'}"
-            @click="filterKey='active'"
-          >
-            Active
-          </li>
-          <li
-            :class="{selected: filterKey === 'completed'}"
-            @click="filterKey='completed'"
-          >
-            Completed
-          </li>
-        </ul>
-        <button class="clear-completed" @click="clearCompleted">Clear Completed</button>
-      </div>
+      <transition name="footer-fade">
+        <div class="footer" v-if="todoList.length">
+          <span class="count">
+            <strong>{{leftTodoListCount}}</strong> items left
+          </span>
+          <ul class="filters">
+            <li
+              :class="{selected: filterKey === 'all'}"
+              @click="filterKey='all'"
+            >
+              All
+            </li>
+            <li
+              :class="{selected: filterKey === 'active'}"
+              @click="filterKey='active'"
+            >
+              Active
+            </li>
+            <li
+              :class="{selected: filterKey === 'completed'}"
+              @click="filterKey='completed'"
+            >
+              Completed
+            </li>
+          </ul>
+          <button class="clear-completed" @click="clearCompleted">
+            Clear Completed
+          </button>
+        </div>
+      </transition>
       <div class="info">
         <p>Double-click to edit a todo</p>
         <p>Press `Enter` or click anywhere to save editing</p>
@@ -170,9 +179,9 @@
             let completed = this.isAllTodoCompleted;
             this.todoList.forEach((todo) => (todo.completed = !completed));
           },
-          clearCompleted: function() {
-            this.todoList = this.todoList.filter(todo => !todo.completed)
-          }
+          clearCompleted: function () {
+            this.todoList = this.todoList.filter((todo) => !todo.completed);
+          },
         },
       });
     </script>

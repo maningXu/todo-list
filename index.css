@@ -216,3 +216,38 @@ i {
   line-height: 1;
   margin: 10px 0;
 }
+
+/* animation */
+.mark-all-fade-enter-active,
+.mark-all-fade-leave-active {
+  transition: opacity 0.5s;
+}
+.mark-all-fade-enter,
+.mark-all-fade-leave-to {
+  opacity: 0;
+}
+
+.footer-fade-enter-active {
+  transition: all 0.5s ease;
+}
+.footer-fade-leave-active {
+  transition: all 0.5s ease;
+}
+.footer-fade-enter,
+.footer-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+.todo-list-enter-active,
+.todo-list-leave-active {
+  transition: all 0.5s;
+}
+.todo-list-enter,
+.todo-list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.todo-list-move {
+  transition: transform 0.5s;
+}
